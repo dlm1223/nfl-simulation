@@ -1,4 +1,4 @@
-NFL Drive Simulation: Long Passes are good
+﻿NFL Drive Simulation: Long Passes are good
 --------------------------------------
 In this post I’ll use simulation to test out different play-calling
 strategies. Certain decisions are already clear like not running against
@@ -349,7 +349,7 @@ percent.field\_goal
 </table>
 There are around 300 total states. Next, like in the post I linked
 above, I simulate a drive by sampling from the data, sampling the
-play/play result based on the state I am currently in. The drive stops
+play result based on the state I am currently in. The drive stops
 when there’s a touchdown, turnover,turnover-on-downs, field goal,field
 goal miss, or safety. Below is an example of a simulated drive starting
 from the 25:
