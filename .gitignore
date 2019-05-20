@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+Misc/
+notes.R
+analyze-sim-results.R
+analyze-all-sim-results.R
+reg_pbp_*.csv
