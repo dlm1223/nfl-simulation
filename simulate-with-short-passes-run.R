@@ -8,9 +8,9 @@ source("simulate-with-short-passes-functions.R")
 
 #assume sack rate on long throws=twice that of short throws
 if("percent.sack"%in% colnames(stateDF)){
-  total<-(stateDF$percent.short.pass+1.5*stateDF$percent.long.pass)
+  total<-(stateDF$percent.short.pass+2*stateDF$percent.long.pass)
   stateDF$percent.short.pass<-stateDF$percent.short.pass+stateDF$percent.sack*stateDF$percent.short.pass/total
-  stateDF$percent.long.pass<-stateDF$percent.long.pass+stateDF$percent.sack*1.5*stateDF$percent.long.pass/total
+  stateDF$percent.long.pass<-stateDF$percent.long.pass+stateDF$percent.sack*2*stateDF$percent.long.pass/total
   head(stateDF, 10)
   stateDF$percent.sack<-NULL
   stateDF[is.na(stateDF)]<-0

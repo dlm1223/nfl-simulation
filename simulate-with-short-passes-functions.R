@@ -50,9 +50,9 @@ scrapr.read <- function(year){
   return(df.scrapr.1)
 }
 
-
-scrapr.plays <- rbindlist(lapply(2011:2018, scrapr.read))
-write_csv(scrapr.plays,"Data/scrapr_plays.csv")
+#run once:
+# scrapr.plays <- rbindlist(lapply(2011:2018, scrapr.read))
+# write_csv(scrapr.plays,"Data/scrapr_plays.csv")
 
 
 ##FILTER/CLEAN DATA######
@@ -152,9 +152,6 @@ table(df.scrimmage$play_type, df.scrimmage$down)
 #function to get state given current down, field positiion
 getState<-function(stateDF=stateDF,down, yards.to.go, yards.from.own.goal){
   
-  cut(yards.to.go, breaks=c(0, 2, 6,9 ,11, 100), include.lowest = F, 
-      labels = c("1-2", "3-6", "7-9", "10-11", "12+"))
-  cut(yards.from.own.goal, breaks=seq(0, 100, 5), include.lowest = T)
   
   stateDF$State.ID[stateDF$down==down&
                      stateDF$ydstogo.bin== cut(yards.to.go, breaks=c(0, 2, 6,9 ,11, 100), include.lowest = F, 
@@ -167,7 +164,7 @@ getState<-function(stateDF=stateDF,down, yards.to.go, yards.from.own.goal){
 #provide data and parameters to sample.play function 
 sample.play <- function(df.scrimmage=df.scrimmage, stateDF=stateDF, down, yards.to.go, yards.from.own.goal,
                         strategyDF=data.frame()) {
-  #down<-4;yards.to.go<-2;yards.from.own.goal<-96;play_type<-c() ;#can uncomment to do a test case
+  #down<-2;yards.to.go<-10;yards.from.own.goal<-56;play_type<-c() ;#can uncomment to do a test case
   
   
   down.original <- down
@@ -183,7 +180,7 @@ sample.play <- function(df.scrimmage=df.scrimmage, stateDF=stateDF, down, yards.
   data.RP$play_type[which(data.RP$play_type=='pass'& data.RP$air_yards>=10& !data.RP$is.sack)]<-"long_pass"
   data.RP$play_type[which(data.RP$play_type=='pass'& data.RP$air_yards<10& !data.RP$is.sack)]<-"short_pass"
   
-  percent.short.sacks<-sum(data.RP$play_type=='short_pass')/sum(1.5*(data.RP$play_type=='long_pass')+(data.RP$play_type=='short_pass'))
+  percent.short.sacks<-sum(data.RP$play_type=='short_pass')/sum(2*(data.RP$play_type=='long_pass')+(data.RP$play_type=='short_pass'))
   
   #attribute 2/3 of sacks to long passes, and 1/3 to short passes
   sacks<-which(data.RP$play_type=='pass'& (data.RP$is.sack | is.na(data.RP$air_yards)))

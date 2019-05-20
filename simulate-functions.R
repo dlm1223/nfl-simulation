@@ -50,11 +50,14 @@ scrapr.read <- function(year){
 }
 
 
-scrapr.plays <- rbindlist(lapply(2011:2018, scrapr.read))
+#run once:
+# scrapr.plays <- rbindlist(lapply(2011:2018, scrapr.read))
+# write_csv(scrapr.plays,"Data/scrapr_plays.csv")
 
 
 
 ##FILTER/CLEAN DATA######
+scrapr.plays<-fread("Data/scrapr_plays.csv")
 
 #use plays run in one possession games, outside of the last two minutes of each half, and not including OT (teams change in OT ex: kick on 2nd down)
 # also drop two-point conversions and extra points
@@ -62,9 +65,6 @@ scrapr.plays <- rbindlist(lapply(2011:2018, scrapr.read))
 # duplicated plays:
 scrapr.plays<-scrapr.plays[!(scrapr.plays$game_id=="2017101509"& scrapr.plays$play_id==837)&
                              !(scrapr.plays$game_id=="2017112302"& scrapr.plays$play_id==3763), ]
-
-table(scrapr.plays$penalty_type[scrapr.plays$play_type=="no_play"& !grepl("No Play", scrapr.plays$desc)])
-scrapr.plays[scrapr.plays$penalty_type=="Defensive Holding", 1:20]
 
 #plays that were challenged and reversed have 2 plays in description. just keep the reversed part of the play
 scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)]<-sapply(strsplit(scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)], "REVERSED"), `[[`, 2)
@@ -140,10 +140,6 @@ table(df.scrimmage$play_type, df.scrimmage$down)
 
 #function to get state given current down, field positiion
 getState<-function(stateDF=stateDF,down, yards.to.go, yards.from.own.goal){
-  
-  cut(yards.to.go, breaks=c(0, 2, 6,9 ,11, 100), include.lowest = F, 
-      labels = c("1-2", "3-6", "7-9", "10-11", "12+"))
-  cut(yards.from.own.goal, breaks=seq(0, 100, 5), include.lowest = T)
   
   stateDF$State.ID[stateDF$down==down&
                      stateDF$ydstogo.bin== cut(yards.to.go, breaks=c(0, 2, 6,9 ,11, 100), include.lowest = F, 
