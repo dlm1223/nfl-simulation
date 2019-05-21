@@ -1237,7 +1237,8 @@ percent.field\_goal
 </tr>
 </tbody>
 </table>
-I’m finally ready to test out several different strategies of increasing
+
+And now I’m finally ready to test out several different strategies of increasing
 long and/or short passes. Below I show the drive results of different
 strategy parameters.
 
