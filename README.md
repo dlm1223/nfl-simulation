@@ -386,7 +386,7 @@ new.distance
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 10
 </td>
 <td style="text-align:right;">
@@ -412,7 +412,7 @@ new.distance
 <td style="text-align:right;">
 2
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 7
 </td>
 <td style="text-align:right;">
@@ -438,7 +438,7 @@ new.distance
 <td style="text-align:right;">
 3
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 4
 </td>
 <td style="text-align:right;">
@@ -465,7 +465,7 @@ yards (J.Sanford).
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 10
 </td>
 <td style="text-align:right;">
@@ -492,7 +492,7 @@ T.Smith).
 <td style="text-align:right;">
 2
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 8
 </td>
 <td style="text-align:right;">
@@ -519,7 +519,7 @@ T.Smith).
 <td style="text-align:right;">
 3
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 8
 </td>
 <td style="text-align:right;">
@@ -546,7 +546,7 @@ for 9 yards.
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 10
 </td>
 <td style="text-align:right;">
@@ -572,7 +572,7 @@ for 9 yards.
 <td style="text-align:right;">
 2
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 7
 </td>
 <td style="text-align:right;">

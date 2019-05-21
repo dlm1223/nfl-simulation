@@ -3,7 +3,7 @@ title: "Testing NFL Play Selection using Simulation"
 author: "David"
 date: "May 20, 2019"
 output:
-  md_document: default
+   md_document: default
 always_allow_html: yes
 ---
 
@@ -37,7 +37,8 @@ The data I am using is PBP data from 2011-2018, filtered to when the game was wi
 ```{r include=T, eval=T , echo=F}
 stateDF[1:10, ]%>%
   kable(row.names = F, digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  column_spec(2, width = "30em")
 ```
 
 There are around 300 total states. Next, like in the post I linked above, I simulate a drive by sampling from the data, sampling the play result based on the state I am currently in. The drive stops when there's a touchdown, turnover,turnover-on-downs, field goal,field goal miss, or safety. Below is an example of a simulated drive starting from the 25:
@@ -83,7 +84,8 @@ while (!end.of.drive){
 drive.store<-rbindlist(drive.store)
 drive.store[, c("down.original", "yards.to.go", "yards.from.own.goal", "State.ID", "desc", "yards_gained", "new.down", "new.distance")]%>%
   kable(row.names = F) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))%>%
+  column_spec(2, width = "30em")
 
 
 ```
