@@ -603,6 +603,7 @@ TOUCHDOWN. Caught at BUF 27.
 I repeat this to get 10,000 simulated drives starting from the 25 yard
 line. I can now look at how these results line up to drives in the
 actual data:
+
 ![](README_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
 It lines up pretty well, the difference could be due to the fact that
