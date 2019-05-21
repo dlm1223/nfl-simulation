@@ -57,7 +57,7 @@ percent.field\_goal
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 1
 </td>
 <td style="text-align:left;">
@@ -86,7 +86,7 @@ percent.field\_goal
 <td style="text-align:right;">
 2
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 2
 </td>
 <td style="text-align:left;">
@@ -115,7 +115,7 @@ percent.field\_goal
 <td style="text-align:right;">
 3
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 3
 </td>
 <td style="text-align:left;">
@@ -144,7 +144,7 @@ percent.field\_goal
 <td style="text-align:right;">
 4
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 4
 </td>
 <td style="text-align:left;">
@@ -173,7 +173,7 @@ percent.field\_goal
 <td style="text-align:right;">
 6
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 2
 </td>
 <td style="text-align:left;">
@@ -202,7 +202,7 @@ percent.field\_goal
 <td style="text-align:right;">
 7
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 3
 </td>
 <td style="text-align:left;">
@@ -231,7 +231,7 @@ percent.field\_goal
 <td style="text-align:right;">
 8
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 4
 </td>
 <td style="text-align:left;">
@@ -260,7 +260,7 @@ percent.field\_goal
 <td style="text-align:right;">
 9
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 1
 </td>
 <td style="text-align:left;">
@@ -289,7 +289,7 @@ percent.field\_goal
 <td style="text-align:right;">
 10
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 2
 </td>
 <td style="text-align:left;">
@@ -318,7 +318,7 @@ percent.field\_goal
 <td style="text-align:right;">
 11
 </td>
-<td style="text-align:right;">
+<td style="text-align:right;width: 30em; ">
 3
 </td>
 <td style="text-align:left;">
@@ -395,7 +395,7 @@ new.distance
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (7:39) (Shotgun) J.Mixon up the middle to CIN 24 for 3 yards (J.Bosa).
 </td>
 <td style="text-align:right;">
@@ -421,7 +421,7 @@ new.distance
 <td style="text-align:right;">
 358
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (2:57) (Shotgun) J.Ajayi right tackle to MIA 33 for 3 yards (C.Dunlap).
 </td>
 <td style="text-align:right;">
@@ -447,7 +447,7 @@ new.distance
 <td style="text-align:right;">
 31
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (1:23) (Shotgun) E.Manning pass short middle to B.Pascoe to NYG 35 for 4
 yards (J.Sanford).
 </td>
@@ -474,7 +474,7 @@ yards (J.Sanford).
 <td style="text-align:right;">
 21
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (:47) (Shotgun) R.Jennings up the middle to NYG 35 for 2 yards (A.Jones;
 T.Smith).
 </td>
@@ -501,7 +501,7 @@ T.Smith).
 <td style="text-align:right;">
 58
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (14:21) (Shotgun) M.Vick pass incomplete short left to O.Schmitt
 \[B.Poppinga\].
 </td>
@@ -528,7 +528,7 @@ T.Smith).
 <td style="text-align:right;">
 59
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (7:25) (Shotgun) M.Sanchez pass short left to L.Dunbar ran ob at DAL 48
 for 9 yards.
 </td>
@@ -555,7 +555,7 @@ for 9 yards.
 <td style="text-align:right;">
 241
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (12:28) S.Jackson left guard to CHI 49 for 3 yards (K.Greene).
 </td>
 <td style="text-align:right;">
@@ -581,7 +581,7 @@ for 9 yards.
 <td style="text-align:right;">
 258
 </td>
-<td style="text-align:left;width: 30em; ">
+<td style="text-align:left;">
 (4:27) (Shotgun) T.Brady pass deep middle to R.Gronkowski for 53 yards,
 TOUCHDOWN. Caught at BUF 27.
 </td>
