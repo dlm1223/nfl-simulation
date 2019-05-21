@@ -1,6 +1,3 @@
-NFL Drive Simulation
---------------------------------------
-
 In this post I’ll use simulation to test out different play-calling
 strategies. Certain decisions are already clear like not running against
 a stacked box–the EPA (expected points added) difference compared to
@@ -398,7 +395,7 @@ new.distance
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (7:39) (Shotgun) J.Mixon up the middle to CIN 24 for 3 yards (J.Bosa).
 </td>
 <td style="text-align:right;">
@@ -424,7 +421,7 @@ new.distance
 <td style="text-align:right;">
 358
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (2:57) (Shotgun) J.Ajayi right tackle to MIA 33 for 3 yards (C.Dunlap).
 </td>
 <td style="text-align:right;">
@@ -450,7 +447,7 @@ new.distance
 <td style="text-align:right;">
 31
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (1:23) (Shotgun) E.Manning pass short middle to B.Pascoe to NYG 35 for 4
 yards (J.Sanford).
 </td>
@@ -477,7 +474,7 @@ yards (J.Sanford).
 <td style="text-align:right;">
 21
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (:47) (Shotgun) R.Jennings up the middle to NYG 35 for 2 yards (A.Jones;
 T.Smith).
 </td>
@@ -504,7 +501,7 @@ T.Smith).
 <td style="text-align:right;">
 58
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (14:21) (Shotgun) M.Vick pass incomplete short left to O.Schmitt
 \[B.Poppinga\].
 </td>
@@ -531,7 +528,7 @@ T.Smith).
 <td style="text-align:right;">
 59
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (7:25) (Shotgun) M.Sanchez pass short left to L.Dunbar ran ob at DAL 48
 for 9 yards.
 </td>
@@ -558,7 +555,7 @@ for 9 yards.
 <td style="text-align:right;">
 241
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (12:28) S.Jackson left guard to CHI 49 for 3 yards (K.Greene).
 </td>
 <td style="text-align:right;">
@@ -584,7 +581,7 @@ for 9 yards.
 <td style="text-align:right;">
 258
 </td>
-<td style="text-align:left;">
+<td style="text-align:left;width: 30em; ">
 (4:27) (Shotgun) T.Brady pass deep middle to R.Gronkowski for 53 yards,
 TOUCHDOWN. Caught at BUF 27.
 </td>
@@ -603,7 +600,6 @@ TOUCHDOWN. Caught at BUF 27.
 I repeat this to get 10,000 simulated drives starting from the 25 yard
 line. I can now look at how these results line up to drives in the
 actual data:
-
 ![](README_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
 It lines up pretty well, the difference could be due to the fact that
@@ -1237,8 +1233,7 @@ percent.field\_goal
 </tr>
 </tbody>
 </table>
-
-And now I’m finally ready to test out several different strategies of increasing
+I’m finally ready to test out several different strategies of increasing
 long and/or short passes. Below I show the drive results of different
 strategy parameters.
 
@@ -1282,7 +1277,8 @@ punts. Overall, my results align with “Expected Points Added” values,
 which is cool because it confirms that EPA is a good guideline for play
 selection, and it also suggests that my system isn’t completely off. I
 was hoping to find a totally contrarian result here but it seems for now
-that EPA does a good job of improving a drive. On the other hand, YPA seems to not always be the best guidelene based on this analysis.  There are definitely some shortcomings to this, for example, a team might be basing it’s play on what the
+that EPA does a good job of improving a drive. There are definitely some
+shortcomings, for example, a team might be basing it’s play on what the
 defense is giving, and that trying to increase deep passing by 10% will
 greatly reduce it’s efficiency. For that reason I tried to keep the
 changes small. I’d like to keep testing this to try out different
