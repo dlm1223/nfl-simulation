@@ -1251,7 +1251,7 @@ just showed a few to keep it simple. This isn’t an exact science, and
 I’ve noticed that the results vary even with 10K simulations. I’ll look
 into different metrics and quantifying the error. The main takeaway is
 that long passes definitely sem to increase TD’s and decrease punts from
-the baseline “default\_part2”. Interes
+the baseline “default\_part2”.
 
 The last thing I’d like to look at is how these results are different to
 just using EPA and/or YPA. From my simulated data which includes the
@@ -1264,7 +1264,7 @@ and second down you can see how long passes seem to have high expected
 value, which is supported in my simulations. On third down, the effect
 isn’t there as much, which I saw in my simulation as there was not
 change when I added long passes to 3rd down. While YPA would suggest
-long passes is best in all states, looking at EPA seems like it may provide
+long passes is best in all states, looking at EPA seems to provide
 better guidance.
 
 Part 4: Conclusion
@@ -1275,16 +1275,10 @@ calling strategies. Long passes, despite their higher variance, seem to
 improve the result of drives and lead to both more touchdowns and less
 punts. Overall, my results align with “Expected Points Added” values,
 which is cool because it confirms that EPA is a good guideline for play
-<<<<<<< HEAD
 selection, and it also suggests that my system isn’t completely off. I
 was hoping to find a totally contrarian result here but it seems for now
 that EPA does a good job of improving a drive. There are definitely some
 shortcomings, for example, a team might be basing it’s play on what the
-=======
-selection, and it suggests that my system isn’t completely off. I
-was hoping to find a totally contrarian result here but it seems so far
-that my results haven't disagreed with EPA. On the other hand, YPA seems to not always be the best guidelene based on this analysis.  There are definitely some potential shortcomings to my system, for example, a team might be basing it’s play on what the
->>>>>>> bf0433a19c119428422c030d2f10b1b084d741b5
 defense is giving, and that trying to increase deep passing by 10% will
 greatly reduce it’s efficiency. For that reason I tried to keep the
 changes small. I’d like to keep testing this to try out different
