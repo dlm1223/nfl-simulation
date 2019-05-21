@@ -2,7 +2,8 @@
 title: "Testing NFL Play Selection using Simulation"
 author: "David"
 date: "May 20, 2019"
-output: md_document
+output:
+  md_document: default
 always_allow_html: yes
 ---
 
@@ -179,7 +180,7 @@ summary(lm(percent.sack~scale(percent.short.pass)+scale(percent.long.pass)+as.fa
 ```
 
 
-Based on this above model, I'm going to assume long passes have a sack rate of 2x that of short passes. So for example, if a state had 30 short, 30 long and 12 sacks, I say 4 were short, 8 were long attempts. This is just a way for me to attribute sacks, I think it is somewhat reasonable. The 2x parameter is something that I can experiment with to see how it affects the results. After attributing the sacks I end up with this:
+Based on this above model, I'm going to assume long passes have a sack rate of 2x that of short passes. So for example, if a state had 30 short, 30 long and 12 sacks, I say 4 were short, 8 were long attempts. This is just a way for me to attribute sacks, I think it is somewhat reasonable. The 2x might be wrong but it is just a parameter that I can experiment with to see how it affects the results. After attributing the sacks I end up with this:
 
 ```{r include=T, eval=T , echo=F}
 if("percent.sack"%in% colnames(stateDF)){
@@ -236,8 +237,8 @@ all.drives.store<-all.drives.store[, `:=`(end.drive.play=as.character(ifelse(is.
                                                                                                   ifelse(is.turnover[end.drive==T]| is.fg.miss[end.drive==T]|is.turnover.downs[end.drive==T], "turnover/turnover.downs/fg.miss",
                                                                                                          NA))))))), by=c("Params", "sim.id")]
 all.drives.store$Params<-gsub("alldrives_|[.]csv", "", all.drives.store$Params)
-all.drives.store$Params[all.drives.store$Params=="alldrives"]<-"default"
-all.drives.store$Params[all.drives.store$Params=="withshortpasses"]<-"default_shortpasses"
+all.drives.store$Params[all.drives.store$Params=="alldrives"]<-"default_part1"
+all.drives.store$Params[all.drives.store$Params=="withshortpasses"]<-"default_part2"
 all.drives.store$Params<-factor(all.drives.store$Params, levels=unique(all.drives.store$Params))
 
 meds<-all.drives.store[all.drives.store$end.drive==T, 
@@ -265,9 +266,9 @@ ggplot(group.means, aes(x = Params,y= percent , fill= end.drive.play, label=roun
 ```
 
 
-Above I display the results from different parameters, ex: x10longpass_down1-2 means add 10% to long pass percentage on every 1-2nd down state. As you can see from the chart, the parameters that do the best are long-pass. Adding +10% to first and second down increases TD-rate and decreases punts. There's countless strategies to try so I just showed a few to keep it simple. This isn't an exact science, and I'm noticing that the default state performs better than the state where I broke up short passes. I'm thinking a reason for this is that the long passes in the default state aren't given the high sack rate that I assume when I break it up. I'm not sure about this though, so I need to check. The main takeaway is that long passes increase TD's and decrease punts from the baseline.
+Above I display the results from different parameters, ex: x10longpass_down1-2 means add 10% to long pass percentage on every 1-2nd down state. As you can see from the chart, the parameters that do the best are long-pass. Adding +10% to first and second down increases TD-rate and decreases punts. There's countless strategies to try so I just showed a few to keep it simple. This isn't an exact science, and I've noticed that the results vary even with 10K simulations. I'll look into different metrics and quantifying the error. The main takeaway is that long passes definitely sem to increase TD's and decrease punts from the baseline "default_part2".
 
-The last thing I'd like to look at is how these results are different to just using EPA and/or YPA? Using my simulated data which includes the estimated sack-rate, I look at EPA and YPA below: 
+The last thing I'd like to look at is how these results are different to just using EPA and/or YPA. From my simulated data which includes the estimated sack-rate, I look at EPA and YPA below: 
 
 
 ```{r include=T, eval=T , echo=F, fig.width=12}
@@ -374,11 +375,12 @@ gridExtra::grid.arrange(p1, p2, ncol=2)
 
 ```
 
-My results line up well with EPA shown on the top right. On 1st and second down you can see how long passes seem to have high expected value, which is supported in my simulations. On third down, the effect isn't there as much, which I saw in my simulation as there was not change when I added long passes to 3rd down. While YPA would suggest long passes is best in all states, looking at EPA seems to provide better guidance.
+My results line up well with EPA chart shown on the top right. On 1st and second down you can see how long passes seem to have high expected value, which is supported in my simulations. On third down, the effect isn't there as much, which I saw in my simulation as there was not change when I added long passes to 3rd down. While YPA would suggest long passes is best in all states, looking at EPA seems to provide better guidance.
+
 
 ## Part 4: Conclusion
 
-In this post I showed my simulation method for testing different play calling strategies. Long passes, despite their higher variance, seem to improve the result of drives and lead to both more touchdowns and less punts. Overall, my results align with "Expected Points Added" values, which is cool because it confirms that EPA is a good guideline for play selection, and it also suggests that my system isn't completely off. I was hoping to find a totally contrarian result here but it seems for now that EPA does a good job of improving a drive. I'd like to keep testing this to try out different parameters such as different strategies or adding medium passes. Thanks for reading. 
+In this post I showed my simulation method for testing different play calling strategies. Long passes, despite their higher variance, seem to improve the result of drives and lead to both more touchdowns and less punts. Overall, my results align with "Expected Points Added" values, which is cool because it confirms that EPA is a good guideline for play selection, and it also suggests that my system isn't completely off. I was hoping to find a totally contrarian result here but it seems for now that EPA does a good job of improving a drive. There are definitely some shortcomings, for example, a team might be basing it's play on what the defense is giving, and that trying to increase deep passing by 10% will greatly reduce it's efficiency. For that reason I tried to keep the changes small. I'd like to keep testing this to try out different parameters such as different strategies or adding medium passes. Thanks for reading. 
 
 [code](github.com/dlm1223/nfl-simulation)
 

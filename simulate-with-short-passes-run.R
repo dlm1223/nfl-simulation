@@ -6,11 +6,13 @@
 source("simulate-with-short-passes-functions.R")
 
 
+sack.param<-2
+
 #assume sack rate on long throws=twice that of short throws
 if("percent.sack"%in% colnames(stateDF)){
-  total<-(stateDF$percent.short.pass+2*stateDF$percent.long.pass)
+  total<-(stateDF$percent.short.pass+sack.param*stateDF$percent.long.pass)
   stateDF$percent.short.pass<-stateDF$percent.short.pass+stateDF$percent.sack*stateDF$percent.short.pass/total
-  stateDF$percent.long.pass<-stateDF$percent.long.pass+stateDF$percent.sack*2*stateDF$percent.long.pass/total
+  stateDF$percent.long.pass<-stateDF$percent.long.pass+stateDF$percent.sack*sack.param*stateDF$percent.long.pass/total
   head(stateDF, 10)
   stateDF$percent.sack<-NULL
   stateDF[is.na(stateDF)]<-0
@@ -63,7 +65,8 @@ for (i in 1:n.sims){
                             down = new.down, 
                             yards.to.go = new.distance, 
                             yards.from.own.goal = new.yfog,
-                            strategyDF = strategyDF
+                            strategyDF = strategyDF, 
+                            sack.param=sack.param
                             
     ) #can specify play_type here
     run.play$play.num <- play.num

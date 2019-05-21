@@ -1003,16 +1003,16 @@ number of long or short passes in a state will increase the sack rate:
     ## 
     ## Residuals:
     ##       Min        1Q    Median        3Q       Max 
-    ## -0.099753 -0.004535 -0.000255  0.005024  0.092783 
+    ## -0.098511 -0.004485 -0.000258  0.005180  0.093534 
     ## 
     ## Coefficients:
     ##                           Estimate Std. Error t value             Pr(>|t|)
-    ## (Intercept)               0.019460   0.002240   8.687 < 0.0000000000000002
-    ## scale(percent.short.pass) 0.009533   0.001635   5.832         0.0000000127
-    ## scale(percent.long.pass)  0.015106   0.001380  10.950 < 0.0000000000000002
-    ## as.factor(down)2          0.002857   0.002916   0.980               0.3279
-    ## as.factor(down)3          0.031930   0.003374   9.464 < 0.0000000000000002
-    ## as.factor(down)4          0.009247   0.003867   2.391               0.0173
+    ## (Intercept)               0.019224   0.002231   8.615 0.000000000000000257
+    ## scale(percent.short.pass) 0.009591   0.001629   5.887 0.000000009372432572
+    ## scale(percent.long.pass)  0.014963   0.001374  10.889 < 0.0000000000000002
+    ## as.factor(down)2          0.002847   0.002904   0.980                0.328
+    ## as.factor(down)3          0.031719   0.003361   9.437 < 0.0000000000000002
+    ## as.factor(down)4          0.009418   0.003852   2.445                0.015
     ##                              
     ## (Intercept)               ***
     ## scale(percent.short.pass) ***
@@ -1023,17 +1023,17 @@ number of long or short passes in a state will increase the sack rate:
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.01798 on 344 degrees of freedom
-    ## Multiple R-squared:  0.7394, Adjusted R-squared:  0.7356 
-    ## F-statistic: 195.2 on 5 and 344 DF,  p-value: < 0.00000000000000022
+    ## Residual standard error: 0.01791 on 344 degrees of freedom
+    ## Multiple R-squared:  0.7382, Adjusted R-squared:  0.7344 
+    ## F-statistic:   194 on 5 and 344 DF,  p-value: < 0.00000000000000022
 
 Based on this above model, I’m going to assume long passes have a sack
 rate of 2x that of short passes. So for example, if a state had 30
 short, 30 long and 12 sacks, I say 4 were short, 8 were long attempts.
 This is just a way for me to attribute sacks, I think it is somewhat
-reasonable. The 2x parameter is something that I can experiment with to
-see how it affects the results. After attributing the sacks I end up
-with this:
+reasonable. The 2x might be wrong but it is just a parameter that I can
+experiment with to see how it affects the results. After attributing the
+sacks I end up with this:
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -1088,7 +1088,7 @@ percent.field\_goal
 5472
 </td>
 <td style="text-align:right;">
-0.307
+0.306
 </td>
 <td style="text-align:right;">
 0.163
@@ -1248,21 +1248,19 @@ x10longpass\_down1-2 means add 10% to long pass percentage on every
 the best are long-pass. Adding +10% to first and second down increases
 TD-rate and decreases punts. There’s countless strategies to try so I
 just showed a few to keep it simple. This isn’t an exact science, and
-I’m noticing that the default state performs better than the state where
-I broke up short passes. I’m thinking a reason for this is that the long
-passes in the default state aren’t given the high sack rate that I
-assume when I break it up. I’m not sure about this though, so I need to
-check. The main takeaway is that long passes increase TD’s and decrease
-punts from the baseline.
+I’ve noticed that the results vary even with 10K simulations. I’ll look
+into different metrics and quantifying the error. The main takeaway is
+that long passes definitely sem to increase TD’s and decrease punts from
+the baseline “default\_part2”.
 
 The last thing I’d like to look at is how these results are different to
-just using EPA and/or YPA? Using my simulated data which includes the
+just using EPA and/or YPA. From my simulated data which includes the
 estimated sack-rate, I look at EPA and YPA below:
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-11-1.png)![](README_files/figure-markdown_strict/unnamed-chunk-11-2.png)
 
-My results line up well with EPA shown on the top right. On 1st and
-second down you can see how long passes seem to have high expected
+My results line up well with EPA chart shown on the top right. On 1st
+and second down you can see how long passes seem to have high expected
 value, which is supported in my simulations. On third down, the effect
 isn’t there as much, which I saw in my simulation as there was not
 change when I added long passes to 3rd down. While YPA would suggest
@@ -1279,8 +1277,12 @@ punts. Overall, my results align with “Expected Points Added” values,
 which is cool because it confirms that EPA is a good guideline for play
 selection, and it also suggests that my system isn’t completely off. I
 was hoping to find a totally contrarian result here but it seems for now
-that EPA does a good job of improving a drive. I’d like to keep testing
-this to try out different parameters such as different strategies or
-adding medium passes. Thanks for reading.
+that EPA does a good job of improving a drive. There are definitely some
+shortcomings, for example, a team might be basing it’s play on what the
+defense is giving, and that trying to increase deep passing by 10% will
+greatly reduce it’s efficiency. For that reason I tried to keep the
+changes small. I’d like to keep testing this to try out different
+parameters such as different strategies or adding medium passes. Thanks
+for reading.
 
 [code](github.com/dlm1223/nfl-simulation)

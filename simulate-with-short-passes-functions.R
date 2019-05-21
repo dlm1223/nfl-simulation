@@ -4,23 +4,23 @@
 
 library(data.table)
 library(reshape2)
-library(tidyverse) 
 library(lubridate) 
-library(beeswarm)  
-library(gganimate) 
-library(ggridges)  
-library(tidyr)     
+library(plyr)
+library(dplyr)
+library(ggplot2)
+# library(dd) 
+# library(beeswarm)  
+# library(gganimate) 
+# library(ggridges)
 options(scipen = 99)
 options(stringsAsFactors = F)
-#https://statsbylopez.netlify.com/post/nfl-team-logos-using-ggimage/
-#https://statsbylopez.netlify.com/post/resampling-nfl-drives/
 
 
 #download files from github
 scrapr.download<-function(year){
   print(year)
   file.read <- paste0("https://raw.githubusercontent.com/ryurko/nflscrapR-data/master/play_by_play_data/regular_season/reg_pbp_",year,".csv")
-  df.scrapr.temp <- suppressMessages(read_csv(file.read))
+  df.scrapr.temp <- suppressMessages(fread(file.read))
   write.csv(df.scrapr.temp, file=paste0("Data/reg_pbp_",year,".csv"), row.names=F)
 }
 # lapply(2011:2018, scrapr.download) #uncomment this to download data--run oncee
@@ -72,7 +72,6 @@ scrapr.plays<-scrapr.plays[!(scrapr.plays$game_id=="2017101509"& scrapr.plays$pl
 scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)]<-sapply(strsplit(scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)], "REVERSED"), `[[`, 2)
 
 df.scrimmage<-scrapr.plays %>%
-  data.frame()%>% 
   filter(play_type %in% c("field_goal", "pass", "run", "punt"),!(half_seconds_remaining < 60*2),qtr<=4, !(qtr==4& half_seconds_remaining<60*5) ) %>% 
   mutate(is.two.point = grepl("TWO-POINT CONVERSION", desc), 
          is.fumble = !is.na(fumble_recovery_1_team), 
@@ -100,16 +99,23 @@ colMeans(df.scrimmage[df.scrimmage$end.drive==F& df.scrimmage$qtr%in% c(1:4), c(
 #these should all come out to 1, but errors with penalties are occuring on~.8% of drives
 table(rowSums(df.scrimmage[df.scrimmage$end.drive==T& df.scrimmage$qtr%in% c(1,3), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")]))
 
-#how do drives end? .7% drives are getting lose due to penalty-coding errors i.e. last play is being coded as no_play
+#how do drives end? .7% drives are getting lost due to penalty-coding errors i.e. last play is being coded as no_play
 colMeans(df.scrimmage[df.scrimmage$end.drive==T& df.scrimmage$qtr%in% c(1,3), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])
 
 #drives that didn't have an "absorbing state", need to fix coding for plays with penalties which I will do
 df.scrimmage[df.scrimmage$end.drive==T & df.scrimmage$qtr%in% c(1,3)&rowSums(df.scrimmage[, c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])==0,c("game_id", "drive") ]
 
+#clean data 
+#impute air_yards
+df.scrimmage$air_yards[which(is.na(df.scrimmage$air_yards)& grepl("deep", df.scrimmage$desc)& df.scrimmage$play_type=='pass')]<-15
+df.scrimmage$air_yards[which(is.na(df.scrimmage$air_yards)& grepl("short", df.scrimmage$desc)& df.scrimmage$play_type=='pass')]<-7
 
-df.scrimmage<-data.frame(df.scrimmage)
+#punt return safety..not bothering with this right now..just treating it as punt
+df.scrimmage$is.safety[df.scrimmage$desc=='(:59) (Punt formation) L.Cooke punts 47 yards to TEN 7, Center-M.Overton. C.Batson MUFFS catch, touched at TEN 7, and recovers at TEN 1. C.Batson tackled in End Zone for -1 yards, SAFETY (L.Jacobs).']<-F
+
 
 #define game states by binning data
+df.scrimmage<-data.frame(df.scrimmage)
 df.scrimmage$ydstogo.bin<-cut(df.scrimmage$ydstogo, breaks=c(0, 2, 6,9 ,11, 100), include.lowest = F, 
                               labels = c("1-2", "3-6", "7-9", "10-11", "12+"))
 df.scrimmage$yfog.bin<-cut(df.scrimmage$yfog, c(seq(0, 95, 5), 97.5, 100), include.lowest = T)
@@ -117,6 +123,7 @@ df.scrimmage$yfog.bin<-cut(df.scrimmage$yfog, c(seq(0, 95, 5), 97.5, 100), inclu
 #create stateDF 
 stateDF<-expand.grid(down=1:4, ydstogo.bin=unique(df.scrimmage$ydstogo.bin), yfog.bin=unique(df.scrimmage$yfog.bin), stringsAsFactors = F)
 stateDF$State.ID<-1:nrow(stateDF)
+
 
 #merge stateDF to df.scrimmage to look at play-stats based on game-state
 df.scrimmage<-merge(df.scrimmage[, !colnames(df.scrimmage)%in% "State.ID"], stateDF, by=c("down","ydstogo.bin","yfog.bin" ), sort=F)
@@ -163,7 +170,7 @@ getState<-function(stateDF=stateDF,down, yards.to.go, yards.from.own.goal){
 
 #provide data and parameters to sample.play function 
 sample.play <- function(df.scrimmage=df.scrimmage, stateDF=stateDF, down, yards.to.go, yards.from.own.goal,
-                        strategyDF=data.frame()) {
+                        strategyDF=data.frame(), sack.param=2) {
   #down<-2;yards.to.go<-10;yards.from.own.goal<-56;play_type<-c() ;#can uncomment to do a test case
   
   
@@ -180,7 +187,8 @@ sample.play <- function(df.scrimmage=df.scrimmage, stateDF=stateDF, down, yards.
   data.RP$play_type[which(data.RP$play_type=='pass'& data.RP$air_yards>=10& !data.RP$is.sack)]<-"long_pass"
   data.RP$play_type[which(data.RP$play_type=='pass'& data.RP$air_yards<10& !data.RP$is.sack)]<-"short_pass"
   
-  percent.short.sacks<-sum(data.RP$play_type=='short_pass')/sum(2*(data.RP$play_type=='long_pass')+(data.RP$play_type=='short_pass'))
+  
+  percent.short.sacks<-sum(data.RP$play_type=='short_pass')/sum(sack.param*(data.RP$play_type=='long_pass')+(data.RP$play_type=='short_pass'))
   
   #attribute 2/3 of sacks to long passes, and 1/3 to short passes
   sacks<-which(data.RP$play_type=='pass'& (data.RP$is.sack | is.na(data.RP$air_yards)))
@@ -194,18 +202,27 @@ sample.play <- function(df.scrimmage=df.scrimmage, stateDF=stateDF, down, yards.
   #below samples according to strategyDF than stateDF
   #ex stateDF for state-1 : pass 30%, rush 30%, punt 40% (observed percentages)
   # strategyDF for state-1 : pass=40, rush=20%, punt=30% (desired percentages)
-  strategy<-strategyDF[strategyDF$State.ID==stateID,]
-  strategy
-  
-  #set sample.weights so that i will pick plays according to my strategyDF, divide by n.play.type makes it so that sampling will coordinate w. strategy
-  data.RP$sample.prob[data.RP$play_type=="long_pass"]<-strategy$percent.long.pass/sum(data.RP$play_type=="long_pass")
-  data.RP$sample.prob[data.RP$play_type=="short_pass"]<-strategy$percent.short.pass/sum(data.RP$play_type=="short_pass")
-  data.RP$sample.prob[data.RP$play_type=="run"]<-strategy$percent.run/sum(data.RP$play_type=="run")
-  data.RP$sample.prob[data.RP$play_type=="punt"]<-strategy$percent.punt/sum(data.RP$play_type=="punt")
-  data.RP$sample.prob[data.RP$play_type=="field_goal"]<-strategy$percent.field_goal/sum(data.RP$play_type=="field_goal")
-  sum(data.RP$sample.prob) #make sure sums to 1
-  
-  sim.RP <- sample_n(data.RP, 1, weight = data.RP$sample.prob)
+  if(nrow(strategyDF)>1){
+    strategy<-strategyDF[strategyDF$State.ID==stateID,]
+    strategy
+    
+    #set sample.weights so that i will pick plays according to my strategyDF, divide by n.play.type makes it so that sampling will coordinate w. strategy
+    data.RP$sample.prob[data.RP$play_type=="long_pass"]<-strategy$percent.long.pass/sum(data.RP$play_type=="long_pass")
+    data.RP$sample.prob[data.RP$play_type=="short_pass"]<-strategy$percent.short.pass/sum(data.RP$play_type=="short_pass")
+    data.RP$sample.prob[data.RP$play_type=="run"]<-strategy$percent.run/sum(data.RP$play_type=="run")
+    data.RP$sample.prob[data.RP$play_type=="punt"]<-strategy$percent.punt/sum(data.RP$play_type=="punt")
+    data.RP$sample.prob[data.RP$play_type=="field_goal"]<-strategy$percent.field_goal/sum(data.RP$play_type=="field_goal")
+    sum(data.RP$sample.prob) #make sure sums to 1
+    
+    sim.RP <- sample_n(data.RP, 1, weight = data.RP$sample.prob)
+    
+    
+  } else{
+    
+    #sample a play from filtered data
+    sim.RP <- sample_n(data.RP, 1)
+    
+  }
   
   #can check here that proportions line up with strategy: 
   #prop.table(table(data.RP$play_type))  #actual data

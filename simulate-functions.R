@@ -1,25 +1,28 @@
 # provide a strategyDF to run a strategy (i.e. percent run/pass/punt/FG) different than the observed strategy in the stateDF data:
 
+# splits pass-attempts into long and short attempts
+#sacks attributed to long vs short throws based on number of long/short throws in given state
+
+
 library(data.table)
 library(reshape2)
-library(tidyverse) 
 library(lubridate) 
-library(beeswarm)  
-library(gganimate) 
-library(ggridges)  
-library(tidyr)     
+library(plyr)
+library(dplyr)
+library(ggplot2)
+# library(dd) 
+# library(beeswarm)  
+# library(gganimate) 
+# library(ggridges)
 options(scipen = 99)
 options(stringsAsFactors = F)
-#https://statsbylopez.netlify.com/post/nfl-team-logos-using-ggimage/
-
-#https://statsbylopez.netlify.com/post/resampling-nfl-drives/
 
 
 #download files from github
 scrapr.download<-function(year){
   print(year)
   file.read <- paste0("https://raw.githubusercontent.com/ryurko/nflscrapR-data/master/play_by_play_data/regular_season/reg_pbp_",year,".csv")
-  df.scrapr.temp <- suppressMessages(read_csv(file.read))
+  df.scrapr.temp <- suppressMessages(fread(file.read))
   write.csv(df.scrapr.temp, file=paste0("Data/reg_pbp_",year,".csv"), row.names=F)
 }
 # lapply(2011:2018, scrapr.download) #uncomment this to download data--run oncee
@@ -49,11 +52,9 @@ scrapr.read <- function(year){
   return(df.scrapr.1)
 }
 
-
 #run once:
 # scrapr.plays <- rbindlist(lapply(2011:2018, scrapr.read))
 # write_csv(scrapr.plays,"Data/scrapr_plays.csv")
-
 
 
 ##FILTER/CLEAN DATA######
@@ -61,6 +62,9 @@ scrapr.plays<-fread("Data/scrapr_plays.csv")
 
 #use plays run in one possession games, outside of the last two minutes of each half, and not including OT (teams change in OT ex: kick on 2nd down)
 # also drop two-point conversions and extra points
+# table(scrapr.plays$penalty_type[scrapr.plays$play_type=="no_play"& !grepl("No Play", scrapr.plays$desc)])
+# scrapr.plays[scrapr.plays$penalty_type=="Defensive Holding", 1:20]
+
 
 # duplicated plays:
 scrapr.plays<-scrapr.plays[!(scrapr.plays$game_id=="2017101509"& scrapr.plays$play_id==837)&
@@ -70,7 +74,6 @@ scrapr.plays<-scrapr.plays[!(scrapr.plays$game_id=="2017101509"& scrapr.plays$pl
 scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)]<-sapply(strsplit(scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)], "REVERSED"), `[[`, 2)
 
 df.scrimmage<-scrapr.plays %>%
-  data.frame()%>% 
   filter(play_type %in% c("field_goal", "pass", "run", "punt"),!(half_seconds_remaining < 60*2),qtr<=4, !(qtr==4& half_seconds_remaining<60*5) ) %>% 
   mutate(is.two.point = grepl("TWO-POINT CONVERSION", desc), 
          is.fumble = !is.na(fumble_recovery_1_team), 
@@ -104,8 +107,15 @@ colMeans(df.scrimmage[df.scrimmage$end.drive==T& df.scrimmage$qtr%in% c(1,3), c(
 #drives that didn't have an "absorbing state", need to fix coding for plays with penalties which I will do
 df.scrimmage[df.scrimmage$end.drive==T & df.scrimmage$qtr%in% c(1,3)&rowSums(df.scrimmage[, c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])==0,c("game_id", "drive") ]
 
-
 df.scrimmage<-data.frame(df.scrimmage)
+
+#clean data 
+#impute air_yards
+df.scrimmage$air_yards[which(is.na(df.scrimmage$air_yards)& grepl("deep", df.scrimmage$desc)& df.scrimmage$play_type=='pass')]<-15
+df.scrimmage$air_yards[which(is.na(df.scrimmage$air_yards)& grepl("short", df.scrimmage$desc)& df.scrimmage$play_type=='pass')]<-7
+
+#punt return safety..not bothering with this right now..just treating it as punt
+df.scrimmage$is.safety[df.scrimmage$desc=='(:59) (Punt formation) L.Cooke punts 47 yards to TEN 7, Center-M.Overton. C.Batson MUFFS catch, touched at TEN 7, and recovers at TEN 1. C.Batson tackled in End Zone for -1 yards, SAFETY (L.Jacobs).']<-F
 
 #define game states by binning data
 df.scrimmage$ydstogo.bin<-cut(df.scrimmage$ydstogo, breaks=c(0, 2, 6,9 ,11, 100), include.lowest = F, 
@@ -115,6 +125,7 @@ df.scrimmage$yfog.bin<-cut(df.scrimmage$yfog, c(seq(0, 95, 5), 97.5, 100), inclu
 #stateDF 
 stateDF<-expand.grid(down=1:4, ydstogo.bin=unique(df.scrimmage$ydstogo.bin), yfog.bin=unique(df.scrimmage$yfog.bin), stringsAsFactors = F)
 stateDF$State.ID<-1:nrow(stateDF)
+
 
 #merge stateDF to df.scrimmage to look at play-stats based on game-state
 df.scrimmage<-merge(df.scrimmage[, !colnames(df.scrimmage)%in% "State.ID"], stateDF, by=c("down","ydstogo.bin","yfog.bin" ), sort=F)
