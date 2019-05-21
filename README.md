@@ -1,3 +1,6 @@
+NFL Drive Simulation
+--------------------------------------
+
 In this post I’ll use simulation to test out different play-calling
 strategies. Certain decisions are already clear like not running against
 a stacked box–the EPA (expected points added) difference compared to
@@ -1277,8 +1280,7 @@ punts. Overall, my results align with “Expected Points Added” values,
 which is cool because it confirms that EPA is a good guideline for play
 selection, and it also suggests that my system isn’t completely off. I
 was hoping to find a totally contrarian result here but it seems for now
-that EPA does a good job of improving a drive. There are definitely some
-shortcomings, for example, a team might be basing it’s play on what the
+that EPA does a good job of improving a drive. On the other hand, YPA seems to not always be the best guidelene based on this analysis.  There are definitely some shortcomings to this, for example, a team might be basing it’s play on what the
 defense is giving, and that trying to increase deep passing by 10% will
 greatly reduce it’s efficiency. For that reason I tried to keep the
 changes small. I’d like to keep testing this to try out different
