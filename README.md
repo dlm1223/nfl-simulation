@@ -1,6 +1,3 @@
-NFL Drive Simulation
---------------------------------------
-
 In this post I’ll use simulation to test out different play-calling
 strategies. Certain decisions are already clear like not running against
 a stacked box–the EPA (expected points added) difference compared to
