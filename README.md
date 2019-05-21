@@ -1,6 +1,3 @@
-﻿NFL Drive Simulation: Long passes are good
---------------------------------------
-
 In this post I’ll use simulation to test out different play-calling
 strategies. Certain decisions are already clear like not running against
 a stacked box–the EPA (expected points added) difference compared to
@@ -603,7 +600,7 @@ TOUCHDOWN. Caught at BUF 27.
 I repeat this to get 10,000 simulated drives starting from the 25 yard
 line. I can now look at how these results line up to drives in the
 actual data:
-![](simulation-writeup-1_files/figure-markdown_strict/unnamed-chunk-4-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
 It lines up pretty well, the difference could be due to the fact that
 the actual data includes penalties and my simulation doesn’t. Even if
@@ -1243,7 +1240,7 @@ strategy parameters.
 Part 3: Analyzing the Results
 -----------------------------
 
-![](simulation-writeup-1_files/figure-markdown_strict/unnamed-chunk-10-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-10-1.png)
 
 Above I display the results from different parameters, ex:
 x10longpass\_down1-2 means add 10% to long pass percentage on every
@@ -1262,7 +1259,7 @@ The last thing I’d like to look at is how these results are different to
 just using EPA and/or YPA? Using my simulated data which includes the
 estimated sack-rate, I look at EPA and YPA below:
 
-![](simulation-writeup-1_files/figure-markdown_strict/unnamed-chunk-11-1.png)![](simulation-writeup-1_files/figure-markdown_strict/unnamed-chunk-11-2.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-11-1.png)![](README_files/figure-markdown_strict/unnamed-chunk-11-2.png)
 
 My results line up well with EPA shown on the top right. On 1st and
 second down you can see how long passes seem to have high expected
