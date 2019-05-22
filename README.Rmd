@@ -37,8 +37,7 @@ The data I am using is PBP data from 2011-2018, filtered to when the game was wi
 ```{r include=T, eval=T , echo=F}
 stateDF[1:10, ]%>%
   kable(row.names = F, digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
-  column_spec(2, width = "30em")
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 There are around 300 total states. Next, like in the post I linked above, I simulate a drive by sampling from the data, sampling the play result based on the state I am currently in. The drive stops when there's a touchdown, turnover,turnover-on-downs, field goal,field goal miss, or safety. Below is an example of a simulated drive starting from the 25:
@@ -85,7 +84,7 @@ drive.store<-rbindlist(drive.store)
 drive.store[, c("down.original", "yards.to.go", "yards.from.own.goal", "State.ID", "desc", "yards_gained", "new.down", "new.distance")]%>%
   kable(row.names = F) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))%>%
-  column_spec(2, width = "30em")
+  column_spec(5, width = "30em")
 
 
 ```
@@ -183,6 +182,7 @@ summary(lm(percent.sack~scale(percent.short.pass)+scale(percent.long.pass)+as.fa
 
 
 Based on this above model, I'm going to assume long passes have a sack rate of 2x that of short passes. So for example, if a state had 30 short, 30 long and 12 sacks, I say 4 were short, 8 were long attempts. This is just a way for me to attribute sacks, I think it is somewhat reasonable. The 2x might be wrong but it is just a parameter that I can experiment with to see how it affects the results. After attributing the sacks I end up with this:
+
 
 ```{r include=T, eval=T , echo=F}
 if("percent.sack"%in% colnames(stateDF)){

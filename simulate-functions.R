@@ -1,5 +1,3 @@
-# provide a strategyDF to run a strategy (i.e. percent run/pass/punt/FG) different than the observed strategy in the stateDF data:
-
 # splits pass-attempts into long and short attempts
 #sacks attributed to long vs short throws based on number of long/short throws in given state
 
@@ -10,10 +8,6 @@ library(lubridate)
 library(plyr)
 library(dplyr)
 library(ggplot2)
-# library(dd) 
-# library(beeswarm)  
-# library(gganimate) 
-# library(ggridges)
 options(scipen = 99)
 options(stringsAsFactors = F)
 
@@ -36,86 +30,79 @@ scrapr.read <- function(year){
   
   df.scrapr.1 <- df.scrapr.temp%>%
     data.frame() %>% 
-    select(home_team, game_date, play_id, game_id, drive, desc,qtr, half_seconds_remaining, game_seconds_remaining, 
+    select(home_team, game_date, play_id, game_id, drive, desc,qtr,game_half, half_seconds_remaining, game_seconds_remaining, 
            down, ydstogo, yardline_100, play_type, yards_gained,
+           
            #play outcomes
-           fourth_down_failed, interception,touchdown, pass_touchdown, rush_touchdown, 
+           fourth_down_failed, interception,touchdown, pass_touchdown, rush_touchdown, td_team,
            penalty, penalty_yards,penalty_team, penalty_type,
-           fumbled_1_team, fumble_recovery_1_team,
-           pass_attempt, rush_attempt, field_goal_attempt, punt_attempt,
+           fumbled_1_team, fumble_recovery_1_team, fumbled_2_team, fumble_recovery_2_team,
+           pass_attempt, rush_attempt, field_goal_attempt, punt_attempt,extra_point_attempt, two_point_attempt,
            
            # pass_attempt, rush_attempt, 
            posteam,posteam_score, defteam_score, posteam_score_post,defteam_score_post,score_differential,score_differential_post,
            
            #other stats
-           air_yards, ep,  epa) 
+           pass_length, pass_location, air_yards, ep,  epa) 
   return(df.scrapr.1)
 }
 
 #run once:
 # scrapr.plays <- rbindlist(lapply(2011:2018, scrapr.read))
-# write_csv(scrapr.plays,"Data/scrapr_plays.csv")
-
+# write.csv(scrapr.plays,"Data/scrapr_plays.csv", row.names = F)
 
 ##FILTER/CLEAN DATA######
 scrapr.plays<-fread("Data/scrapr_plays.csv")
 
-#use plays run in one possession games, outside of the last two minutes of each half, and not including OT (teams change in OT ex: kick on 2nd down)
-# also drop two-point conversions and extra points
-# table(scrapr.plays$penalty_type[scrapr.plays$play_type=="no_play"& !grepl("No Play", scrapr.plays$desc)])
-# scrapr.plays[scrapr.plays$penalty_type=="Defensive Holding", 1:20]
-
-
-# duplicated plays:
+#clean duplicate plays/games with missing data:
 scrapr.plays<-scrapr.plays[!(scrapr.plays$game_id=="2017101509"& scrapr.plays$play_id==837)&
-                             !(scrapr.plays$game_id=="2017112302"& scrapr.plays$play_id==3763), ]
+                             !(scrapr.plays$game_id=="2017112302"& scrapr.plays$play_id==3763)& 
+                             !scrapr.plays$game_id%in% c("2013112401","2013120101" ), ]
+scrapr.plays$yardline_100[scrapr.plays$game_id=='2013101303'& scrapr.plays$play_id==3607]<-45
 
 #plays that were challenged and reversed have 2 plays in description. just keep the reversed part of the play
 scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)]<-sapply(strsplit(scrapr.plays$desc[grepl("REVERSED", scrapr.plays$desc)], "REVERSED"), `[[`, 2)
+scrapr.plays$yfog <- 100 - scrapr.plays$yardline_100
+scrapr.plays$ptsnet<-scrapr.plays$score_differential_post-scrapr.plays$score_differential
 
-df.scrimmage<-scrapr.plays %>%
-  filter(play_type %in% c("field_goal", "pass", "run", "punt"),!(half_seconds_remaining < 60*2),qtr<=4, !(qtr==4& half_seconds_remaining<60*5) ) %>% 
-  mutate(is.two.point = grepl("TWO-POINT CONVERSION", desc), 
-         is.fumble = !is.na(fumble_recovery_1_team), 
+
+df.scrimmage<-scrapr.plays[ !is.na(scrapr.plays$down), ] #down is NA for extra pts, kickoffs, and timeouts
+df.scrimmage <- df.scrimmage[, `:=`(end.drive=c(rep(F, length(game_date)-1), T), 
+                                    start.drive=c(T, rep(F, length(game_date)-1))
+), by=c( "drive","game_id")]
+df.scrimmage$fumble_recovery_team<-ifelse(is.na(df.scrimmage$fumbled_2_team), df.scrimmage$fumble_recovery_1_team, 
+                                          df.scrimmage$fumble_recovery_2_team  )
+
+
+df.scrimmage<-df.scrimmage %>%
+  filter(play_type %in% c("field_goal", "pass", "run", "punt"), abs(score_differential) <= 8,!(half_seconds_remaining < 60*2),qtr<=4, !(qtr==4& half_seconds_remaining<60*5) ) %>% 
+  mutate(is.fumble = !is.na(fumble_recovery_1_team)| (grepl("FUMBLE", desc)& grepl("Touchback", desc)), 
          is.punt=(play_type=='punt'),
          is.fg=(play_type=='field_goal'),
          is.sack = grepl("sacked", desc), 
          is.safety=grepl("SAFETY", desc)& !is.punt& !is.fg, #as stated before, 
-         is.turnover = (interception)| (is.fumble & fumble_recovery_1_team!=posteam& fumbled_1_team==posteam) , 
-         is.td.offense = rush_touchdown|pass_touchdown, 
-         is.turnover.downs=as.logical(fourth_down_failed)& !is.turnover& !is.safety& !is.punt,
-         yfog = 100 - yardline_100) %>% 
-  filter(abs(score_differential) <= 8, !is.two.point, 
-         !is.na(yards_gained))%>% #2 games in 2013 has missing data
+         is.turnover = (interception) | (is.fumble & fumble_recovery_team!=posteam& fumbled_1_team==posteam)| (is.fumble& grepl("Touchback", desc)) , 
+         is.td.offense = rush_touchdown|pass_touchdown | (!is.na(td_team)& td_team==posteam), 
+         is.turnover.downs=as.logical(fourth_down_failed)& !is.turnover& !is.safety& !is.punt) %>% 
   data.table()
 
-
-#6 absorbing states: fg, punt, turnover, offenseTD, safety, turnover.on.downs
-df.scrimmage <- df.scrimmage[, `:=`(end.drive=c(rep(F, length(game_date)-1), T), 
-                                    start.drive=c(T, rep(F, length(game_date)-1))
-), by=c( "drive","game_id")]
-
-colMeans(df.scrimmage[df.scrimmage$end.drive==T& df.scrimmage$qtr%in% c(1,3), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])
-colMeans(df.scrimmage[df.scrimmage$end.drive==F& df.scrimmage$qtr%in% c(1:4), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])
-
-#these should all come out to 1, but errors with penalties are occuring on~.8% of drives
-table(rowSums(df.scrimmage[df.scrimmage$end.drive==T& df.scrimmage$qtr%in% c(1,3), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")]))
-
-#how do drives end? .7% drives are getting lose due to penalty-coding errors i.e. last play is being coded as no_play
-colMeans(df.scrimmage[df.scrimmage$end.drive==T& df.scrimmage$qtr%in% c(1,3), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])
-
-#drives that didn't have an "absorbing state", need to fix coding for plays with penalties which I will do
-df.scrimmage[df.scrimmage$end.drive==T & df.scrimmage$qtr%in% c(1,3)&rowSums(df.scrimmage[, c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])==0,c("game_id", "drive") ]
-
-df.scrimmage<-data.frame(df.scrimmage)
 
 #clean data 
 #impute air_yards
 df.scrimmage$air_yards[which(is.na(df.scrimmage$air_yards)& grepl("deep", df.scrimmage$desc)& df.scrimmage$play_type=='pass')]<-15
 df.scrimmage$air_yards[which(is.na(df.scrimmage$air_yards)& grepl("short", df.scrimmage$desc)& df.scrimmage$play_type=='pass')]<-7
 
-#punt return safety..not bothering with this right now..just treating it as punt
+#clean data 
 df.scrimmage$is.safety[df.scrimmage$desc=='(:59) (Punt formation) L.Cooke punts 47 yards to TEN 7, Center-M.Overton. C.Batson MUFFS catch, touched at TEN 7, and recovers at TEN 1. C.Batson tackled in End Zone for -1 yards, SAFETY (L.Jacobs).']<-F
+df.scrimmage$is.turnover[df.scrimmage$desc=="(12:19) (Shotgun) J.McKinnon up the middle to GB 20 for 2 yards (K.Clark). FUMBLES (K.Clark), RECOVERED by GB-C.Matthews at GB 19. C.Matthews to MIN 18 for 63 yards (L.Treadwell). FUMBLES (L.Treadwell), ball out of bounds at MIN 18."]<-T
+
+#check ending states of drives. if end.drive=F, should not have ending state
+colMeans(df.scrimmage[df.scrimmage$end.drive==T& df.scrimmage$qtr%in% c(1:4), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])
+colMeans(df.scrimmage[df.scrimmage$end.drive==F& df.scrimmage$qtr%in% c(1:4), c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])
+# df.scrimmage[df.scrimmage$end.drive==T& rowSums(df.scrimmage[, c("is.punt", "is.fg", "is.turnover", "is.td.offense", "is.safety", "is.turnover.downs")])==0, ] #drive ending without an absorbing state (check these)
+
+
+####DEFINE GAME STATES#######
 
 #define game states by binning data
 df.scrimmage$ydstogo.bin<-cut(df.scrimmage$ydstogo, breaks=c(0, 2, 6,9 ,11, 100), include.lowest = F, 
@@ -128,8 +115,8 @@ stateDF$State.ID<-1:nrow(stateDF)
 
 
 #merge stateDF to df.scrimmage to look at play-stats based on game-state
-df.scrimmage<-merge(df.scrimmage[, !colnames(df.scrimmage)%in% "State.ID"], stateDF, by=c("down","ydstogo.bin","yfog.bin" ), sort=F)
-freqs<-data.table(df.scrimmage)[,list(freq=length(play_type),
+df.scrimmage<-merge(df.scrimmage, stateDF, by=c("down","ydstogo.bin","yfog.bin" ), sort=F)
+freqs<-df.scrimmage[,list(freq=length(play_type),
                                       percent.pass=mean(play_type=="pass", na.rm=T), 
                                       percent.run=mean(play_type=="run", na.rm=T), 
                                       percent.punt=mean(play_type=="punt", na.rm=T), 
@@ -232,6 +219,8 @@ sample.play <- function(df.scrimmage=df.scrimmage, stateDF=stateDF, down, yards.
                            air_yards=sim.RP$air_yards,
                            epa=sim.RP$epa,
                            ep=sim.RP$ep,
+                           ptsnet=sim.RP$ptsnet,
+                           
                            play_type=sim.RP$play_type,
                            State.ID=sim.RP$State.ID,
                            

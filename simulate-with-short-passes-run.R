@@ -32,7 +32,7 @@ adjust.row(strategy = stateDF[1:2, ], increase.percent = .2, increase.var = "per
 #specify strategy, or leave default
 strategyDF<-stateDF
 # strategyDF[strategyDF$down%in% 1:2,]<-
-#   adjust.row(strategyDF[strategyDF$down%in% 1:2, ], increase.percent = .1, increase.var = "percent.long.pass")
+  # adjust.row(strategyDF[strategyDF$down%in% 1:2, ], increase.percent = .1, increase.var = "percent.short.pass")
 
 #check strategy:
 head(strategyDF)

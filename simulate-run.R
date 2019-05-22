@@ -11,8 +11,8 @@ adjust.row(strategy = stateDF[1:2, ], increase.percent = .2, increase.var = "per
 
 #specify strategy:
 strategyDF<-stateDF
-# strategyDF[strategyDF$down%in% 1:2,]<-
-  # adjust.row(strategyDF[strategyDF$down%in%1:2, ], increase.percent = .1, increase.var = "percent.pass")
+strategyDF[strategyDF$down%in% 1:3,]<-
+  adjust.row(strategyDF[strategyDF$down%in%1:3, ], increase.percent = .1, increase.var = "percent.pass")
 
 #check strategy:
 head(strategyDF)
@@ -67,7 +67,7 @@ for (i in 1:n.sims){
 #combine and save
 all.drives.store<-rbindlist(all.drives.store)
 
-write.csv(all.drives.store, file="Data/alldrives.csv", row.names = F)
+write.csv(all.drives.store, file="Data/alldrives_passx10_downs1-3.csv", row.names = F)
 
 
 # table(all.drives.store$play_type, all.drives.store$down)
