@@ -1279,7 +1279,7 @@ that EPA does a good job of improving a drive. There are definitely some
 shortcomings, for example, a team might be basing it’s play on what the
 defense is giving, and that trying to increase deep passing by 10% will
 greatly reduce it’s efficiency. For that reason I tried to keep the
-changes small. Another big shortcoming I think is that changing my binnings will have an effect. It could be that changing the binning to short, medium, and long will make a difference. I’d like to keep testing this system to try out
+changes small. The other big shortcoming I think is that changing my binnings will have an effect. It could be that changing the binning to short, medium, and long will make a difference and that in reality passes 5-15 yards are the high EV plays and the really short plays are the ones dragging things down. I’d like to keep testing this system to try out
 different strategies or add medium passes. Thanks
 for reading.
 
