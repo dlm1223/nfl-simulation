@@ -1,12 +1,7 @@
 Simulating NFL Play-Calling Strategies
 --------------------------------------
 In this post I’ll use simulation to test out different play-calling
-strategies. Certain decisions are already clear like not running against
-a stacked box–the EPA (expected points added) difference compared to
-passing here is so high that teams should reduce the amount they run.
-But in a situation like first down and 10, a long pass might have the
-highest EPA there, but maybe there is value in taking a low risk, low
-value play that will sustain a drive. I ran drive simulations to test
+strategies. EPA (expected points added) is very useful in telling you expected value of a play on average. I'm still trying to understand though if the variance of a play matters, for example, does it make sense to take a lower EPA run on first down so you end up with 2nd and 7 rather than a good chance of having 2nd and 10 if you pass. I ran drive simulations to test
 out these different strategies, and then I could see if the high EPA
 and/or YPA play is the best choice. I got a lot of this code from [this
 post](https://statsbylopez.netlify.com/post/resampling-nfl-drives/)
@@ -1284,8 +1279,8 @@ that EPA does a good job of improving a drive. There are definitely some
 shortcomings, for example, a team might be basing it’s play on what the
 defense is giving, and that trying to increase deep passing by 10% will
 greatly reduce it’s efficiency. For that reason I tried to keep the
-changes small. I’d like to keep testing this to try out different
-parameters such as different strategies or adding medium passes. Thanks
+changes small. Another big shortcoming I think is that changing my binnings will have an effect. It could be that changing the binning to short, medium, and long will make a difference. I’d like to keep testing this system to try out
+different strategies or add medium passes. Thanks
 for reading.
 
 [code](github.com/dlm1223/nfl-simulation)
