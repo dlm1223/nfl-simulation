@@ -1277,9 +1277,7 @@ selection, and it also suggests that my system isn’t completely off. I
 was hoping to find a totally contrarian result here but it seems for now
 that EPA does a good job of improving a drive. There are definitely some
 shortcomings, for example, a team might be basing it’s play on what the
-defense is giving, and that trying to increase deep passing by 10% will
-greatly reduce it’s efficiency. For that reason I tried to keep the
-changes small. The other big shortcoming I think is that changing my binnings will have an effect. It could be that changing the binning to short, medium, and long will make a difference and that in reality passes 5-15 yards are the high EV plays and the really short plays are the ones dragging things down. I’d like to keep testing this system to try out
+defense is giving, and that a deep attempt occurs when things like coverage and pass protection are in the offense's favor. It's possible that rying to increase deep passing by 10% will result in lower quality deep pass attempts. I think having data on time to throw and receiver seperation may be useful in better understanding the EPA difference of deep and short passes. Finally, another shortcoming is that the binning I used may be misleading. Changing the binning to short, medium, and long could definitely make a difference it's entireley possible that the really short plays are the ones dragging things down for the short passes. I’d like to keep testing this system to try out
 different strategies or add medium passes. Thanks
 for reading.
 
