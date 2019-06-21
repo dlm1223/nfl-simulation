@@ -1,7 +1,7 @@
 Simulating NFL Play-Calling Strategies
 --------------------------------------
 In this post I’ll use simulation to test out different play-calling
-strategies. EPA (expected points added) is very useful in telling you expected value of a play on average. I'm still trying to understand though if the variance of a play matters, for example, does it make sense to take a lower EPA run on first down so you end up with 2nd and 7 rather a higher variance pass that will give you a good chance of second and long. I ran drive simulations to test
+strategies. EPA (expected points added) is very useful in telling you expected value of a play on average. For example, it will say that passing on first down gives you +.25 expected points added on average, whereas running gives you +.1 on average. I'm still trying to understand though if the variance of a play matters, for example, does it make sense to take a lower EPA run on first down so you end up with 2nd and 7 rather a higher variance pass that will give you a good chance of second and long. I ran drive simulations to test
 out these different strategies, and then I could see if the high EPA
 and/or YPA play is the best choice. I got a lot of this code from [this
 post](https://statsbylopez.netlify.com/post/resampling-nfl-drives/)
