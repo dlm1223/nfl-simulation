@@ -182,7 +182,7 @@ sample.play <- function(df.scrimmage=df.scrimmage, stateDF=stateDF, down, yards.
   #attribute 2/3 of sacks to long passes, and 1/3 to short passes
   sacks<-which(data.RP$play_type=='pass'& (data.RP$is.sack | is.na(data.RP$air_yards)))
   if(length(sacks)>0){
-    data.RP$play_type[sample(sacks, size = length(sacks)*percent.short.sacks)]<-"short_pass" #assign short_pass from sacks, relativy to num shortpasses
+    data.RP$play_type[sample(sacks, size = length(sacks)*percent.short.sacks, replace=F)]<-"short_pass" #assign short_pass from sacks, relativy to num shortpasses
     data.RP$play_type[data.RP$play_type=="pass"]<-"long_pass" #rest are long_pass
     table(data.RP$play_type)
   }

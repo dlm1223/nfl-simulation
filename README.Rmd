@@ -1,19 +1,19 @@
 ---
-title: "Testing NFL Play Selection using Simulation"
-author: "David"
-date: "May 20, 2019"
 output:
-   md_document: default
-always_allow_html: yes
+  md_document:
+    toc: false
+    variant: gfm
 ---
+
+# Simulating NFL Play-Calling Strategies
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height = 4,echo = TRUE)
 ```
 
 
-
-In this post I'll use simulation to test out different play-calling strategies. Certain decisions are already clear like not running against a stacked box--the EPA (expected points added) difference compared to passing here is so high that teams should reduce the amount they run. But in a situation like first down and 10, a long pass might have the highest EPA there, but maybe there is value in taking a low risk, low value play that will sustain a drive. I ran drive simulations to test out these different strategies, and then I could see if the high EPA and/or YPA play is the best choice. I got a lot of this code from [this post](https://statsbylopez.netlify.com/post/resampling-nfl-drives/) which was very helpful, and I made changes like creating game states and some other things.
+In this post I’ll use simulation to test out different play-calling strategies. EPA (expected points added) is very useful in telling you expected value of a play on average. For example, it will say that passing on first down gives you +.25 expected points added on average, whereas running gives you +.1 on average. I'm still trying to understand though if the variance of a play matters, for example, does it make sense to take a lower EPA run on first down so you end up with 2nd and 7 rather a higher variance pass that will give you a good chance of second and long. I ran drive simulations to test out these different strategies, and then I could see if the high EPA and/or YPA play is the best choice. I got a lot of this code from [this post](https://statsbylopez.netlify.com/post/resampling-nfl-drives/) which was very helpful, and I made changes like creating game states and some other things.
 
 
 ## Part 1: Methodology: Simulating Drives 
@@ -30,18 +30,18 @@ source("simulate-functions.R")
 
 ```
 
-The data I am using is PBP data from 2011-2018, filtered to when the game was within 1-score, >=2 minutes before halftime and >=5 minutes before the end of the game.  I define game state below based on down, yards-to-go, and yards-from-own-goal. Below are some of the states:
+The data I am using is PBP data from 2011-2018, filtered to when the game was within 1-score, >=2 minutes before halftime and >=5 minutes before the end of the game. I define game state below based on down, yards-to-go, and yards-from-own-goal. Below are some of the states:
+
 
 
 
 ```{r include=T, eval=T , echo=F}
-stateDF[1:10, ]%>%
-  kable(row.names = F, digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+stateDF[1:10, ]#%>%
+  # kable(row.names = F, digits = 3) %>%
+  # kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
-There are around 300 total states. Next, like in the post I linked above, I simulate a drive by sampling from the data, sampling the play result based on the state I am currently in. The drive stops when there's a touchdown, turnover,turnover-on-downs, field goal,field goal miss, or safety. Below is an example of a simulated drive starting from the 25:
-
+There are around 300 total states. Next, like in the post I linked above, I simulate a drive by sampling from the data, sampling the play result based on the state I am currently in. The drive stops when there’s a touchdown, turnover,turnover-on-downs, field goal,field goal miss, or safety. Below is an example of a simulated drive starting from the 25:
 
 ```{r include=T, eval=T , echo=F}
 
@@ -81,10 +81,10 @@ while (!end.of.drive){
   drive.store[1:play.num]
 }
 drive.store<-rbindlist(drive.store)
-drive.store[, c("down.original", "yards.to.go", "yards.from.own.goal", "State.ID", "desc", "yards_gained", "new.down", "new.distance")]%>%
-  kable(row.names = F) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))%>%
-  column_spec(5, width = "30em")
+drive.store[, c("down.original", "yards.to.go", "yards.from.own.goal", "State.ID", "desc", "yards_gained", "new.down", "new.distance")]#%>%
+  # kable(row.names = F) %>%
+  # kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))%>%
+  # column_spec(5, width = "30em")
 
 
 ```
@@ -145,9 +145,9 @@ ggplot( data = all.means, aes(x = Type, y = percent, fill = end.drive.play, labe
 It lines up pretty well, the difference could be due to the fact that the actual data includes penalties and my simulation doesn't. Even if there are differences, I'm mainly focusing on how strategies will increase from my simulated baseline. Now that I have the baseline, I can define any custom strategy I want and see how it changes the results. For example, instead of the default state here:
 
 ```{r include=T, eval=T , echo=F}
-stateDF[1:5, ]%>%
-  kable(row.names = F, digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+stateDF[1:5, ]#%>%
+  # kable(row.names = F, digits = 3) %>%
+  # kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 I can increase passes +10% on 1st-3rd downs:
@@ -157,9 +157,9 @@ I can increase passes +10% on 1st-3rd downs:
 strategyDF<-stateDF
 strategyDF[strategyDF$down%in% 1:3,]<-
   adjust.row(strategyDF[strategyDF$down%in%1:3 , ], increase.percent = .1, increase.var = "percent.pass")
-strategyDF[1:5, ]%>%
-  kable(row.names = F, digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+strategyDF[1:5, ]#%>%
+  # kable(row.names = F, digits = 3) %>%
+  # kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 
@@ -167,9 +167,10 @@ For example in state 1, I select a pass 57% of the time instead of 47% of the ti
 
 
 ## Part 2: Methodology: Long and Short Passes
-Before I test out different strategies, I wanted to account for one more thing. I wanted to seperate short passes from long passes so that in a strategy I can specify long or short pass. I define short as <10 air-yard pass, and long as >=10 air-yard pass. There's evidence that deep passes are where the real value is at, for example [here](http://archive.advancedfootballanalytics.com/2010/09/deep-vs-short-passes.html) so I wanted to include this.
+Before I test out different strategies, I wanted to account for one more thing. I wanted to separate short passes from long passes so that in a strategy I can specify long or short pass. I define short as <10 air-yard pass, and long as >=10 air-yard pass. There's evidence that deep passes are where the real value is at, for example [here](http://archive.advancedfootballanalytics.com/2010/09/deep-vs-short-passes.html) so I wanted to include this.
 
-The main problem here though which was mentioned in that link is that sacks happen before a pass is attempted, so you don't know whether it should be attributed to short or long.  I do have some way to handle this though. First of all, if a state has 90% long passes and 10% short, then sacks in that state should probably mostly be attributed as long pass attempts. In addition, there is probably a different sack-rate for long and short attempts. To calculate this, I aggregate long-passes, short-passes, and sacks by state, then estimate how much a change in the number of long or short passes in a state will increase the sack rate:
+The main problem here though which was mentioned in that link is that sacks happen before a pass is attempted, so you don’t know whether it should be attributed to short or long. I do have some way to handle this though. First of all, if a state has 90% long passes and 10% short, then sacks in that state should probably mostly be attributed as long pass attempts. In addition, there is probably a different sack-rate for long and short attempts. To calculate this, I aggregate long-passes, short-passes, and sacks by state, then estimate how much a change in the number of long or short passes in a state will increase the sack rate:
+
 
 ```{r include=F, eval=T , echo=F}
 source("simulate-with-short-passes-functions.R")
@@ -181,7 +182,8 @@ summary(lm(percent.sack~scale(percent.short.pass)+scale(percent.long.pass)+as.fa
 ```
 
 
-Based on this above model, I'm going to assume long passes have a sack rate of 2x that of short passes. So for example, if a state had 30 short, 30 long and 12 sacks, I say 4 were short, 8 were long attempts. This is just a way for me to attribute sacks, I think it is somewhat reasonable. The 2x might be wrong but it is just a parameter that I can experiment with to see how it affects the results. After attributing the sacks I end up with this:
+Based on this above model, I’m going to assume long passes have a sack rate of 2x that of short passes. So for example, if a state had 30 short, 30 long and 12 sacks, I say 4 were short, 8 were long attempts. This is just a way for me to attribute sacks, I think it is somewhat reasonable. The 2x might be wrong but it is just a parameter that I can experiment with to see how it affects the results. After attributing the sacks I end up with this:
+
 
 
 ```{r include=T, eval=T , echo=F}
@@ -194,9 +196,9 @@ if("percent.sack"%in% colnames(stateDF)){
   stateDF[is.na(stateDF)]<-0
 }
 
-stateDF[1:5, ]%>%
-  kable(row.names = F, digits = 3) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+stateDF[1:5, ]#%>%
+  # kable(row.names = F, digits = 3) %>%
+  # kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
 ```
 
@@ -268,9 +270,10 @@ ggplot(group.means, aes(x = Params,y= percent , fill= end.drive.play, label=roun
 ```
 
 
-Above I display the results from different parameters, ex: x10longpass_down1-2 means add 10% to long pass percentage on every 1-2nd down state. As you can see from the chart, the parameters that do the best are long-pass. Adding +10% to first and second down increases TD-rate and decreases punts. There's countless strategies to try so I just showed a few to keep it simple. This isn't an exact science, and I've noticed that the results vary even with 10K simulations. I'll look into different metrics and quantifying the error. The main takeaway is that long passes definitely sem to increase TD's and decrease punts from the baseline "default_part2".
+Above I display the results from different parameters, ex: x10longpass_down1-2 means add 10% to long pass percentage on every 1-2nd down state. As you can see from the chart, the parameters that do the best are long-pass. Adding +10% to first and second down increases TD-rate and decreases punts. There’s countless strategies to try so I just showed a few to keep it simple. This isn’t an exact science, and I’ve noticed that the results vary even with 10K simulations. I’ll look into different metrics and quantifying the error. The main takeaway is that long passes definitely sem to increase TD’s and decrease punts from the baseline “default_part2”.
 
-The last thing I'd like to look at is how these results are different to just using EPA and/or YPA. From my simulated data which includes the estimated sack-rate, I look at EPA and YPA below: 
+The last thing I’d like to look at is how these results are different to just using EPA and/or YPA. From my simulated data which includes the estimated sack-rate, I look at EPA and YPA below:
+
 
 
 ```{r include=T, eval=T , echo=F, fig.width=12}
@@ -377,12 +380,15 @@ gridExtra::grid.arrange(p1, p2, ncol=2)
 
 ```
 
-My results line up well with EPA chart shown on the top right. On 1st and second down you can see how long passes seem to have high expected value, which is supported in my simulations. On third down, the effect isn't there as much, which I saw in my simulation as there was not change when I added long passes to 3rd down. While YPA would suggest long passes is best in all states, looking at EPA seems to provide better guidance.
+My results line up well with EPA chart shown on the top right. On 1st and second down you can see how long passes seem to have high expected value, which is supported in my simulations. On third down, the effect isn’t there as much, which I saw in my simulation as there was not change when I added long passes to 3rd down. While YPA would suggest long passes is best in all states, looking at EPA seems to provide better guidance.
+
 
 
 ## Part 4: Conclusion
 
-In this post I showed my simulation method for testing different play calling strategies. Long passes, despite their higher variance, seem to improve the result of drives and lead to both more touchdowns and less punts. Overall, my results align with "Expected Points Added" values, which is cool because it confirms that EPA is a good guideline for play selection, and it also suggests that my system isn't completely off. I was hoping to find a totally contrarian result here but it seems for now that EPA does a good job of improving a drive. There are definitely some shortcomings, for example, a team might be basing it's play on what the defense is giving, and that trying to increase deep passing by 10% will greatly reduce it's efficiency. For that reason I tried to keep the changes small. I'd like to keep testing this to try out different parameters such as different strategies or adding medium passes. Thanks for reading. 
+In this post I showed my simulation method for testing different play calling strategies. Long passes, despite their higher variance, seem to improve the result of drives and lead to both more touchdowns and less punts. Overall, my results align with “Expected Points Added” values, which is cool because it confirms that EPA is a good guideline for play selection, and it also suggests that my system isn’t completely off. I was hoping to find a totally contrarian result here but it seems for now that EPA does a good job of improving a drive. There are definitely some shortcomings, for example, a team might be basing it’s play on what the defense is giving, and that a deep attempt occurs when things like coverage and pass protection are in the offense's favor. It's possible that rying to increase deep passing by 10% will result in lower quality deep pass attempts. I think having data on time to throw and receiver seperation may be useful in better understanding the EPA difference of deep and short passes. Finally, another shortcoming is that the binning I used may be misleading. Changing the binning to short, medium, and long could definitely make a difference it's entireley possible that the really short plays are the ones dragging things down for the short passes. I’d like to keep testing this system to try out different strategies or add medium passes. Thanks for reading.
+
+
 
 [code](github.com/dlm1223/nfl-simulation)
 
