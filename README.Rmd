@@ -10,6 +10,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height = 4,echo = TRUE)
+options(width = 10000)
+
 ```
 
 

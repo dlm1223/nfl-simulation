@@ -23,51 +23,31 @@ before the end of the game. I define game state below based on down,
 yards-to-go, and yards-from-own-goal. Below are some of the
     states:
 
-    ##    State.ID down ydstogo.bin yfog.bin freq percent.pass percent.run
-    ## 1         1    1       10-11  (20,25] 5471    0.4697496 0.530250411
-    ## 2         2    2       10-11  (20,25] 1090    0.5440367 0.455963303
-    ## 3         3    3       10-11  (20,25]  292    0.9349315 0.065068493
-    ## 4         4    4       10-11  (20,25]  136    0.0000000 0.007352941
-    ## 5         6    2         1-2  (20,25]  145    0.2827586 0.717241379
-    ## 6         7    3         1-2  (20,25]  214    0.4439252 0.556074766
-    ## 7         8    4         1-2  (20,25]  111    0.0000000 0.027027027
-    ## 8         9    1         3-6  (20,25]   39    0.3333333 0.666666667
-    ## 9        10    2         3-6  (20,25] 1031    0.4578080 0.542192047
-    ## 10       11    3         3-6  (20,25]  726    0.9049587 0.095041322
-    ##    percent.punt percent.field_goal
-    ## 1     0.0000000                  0
-    ## 2     0.0000000                  0
-    ## 3     0.0000000                  0
-    ## 4     0.9926471                  0
-    ## 5     0.0000000                  0
-    ## 6     0.0000000                  0
-    ## 7     0.9729730                  0
-    ## 8     0.0000000                  0
-    ## 9     0.0000000                  0
-    ## 10    0.0000000                  0
+    ##    State.ID down ydstogo.bin yfog.bin freq percent.pass percent.run percent.punt percent.field_goal
+    ## 1         1    1       10-11  (20,25] 5471    0.4697496 0.530250411    0.0000000                  0
+    ## 2         2    2       10-11  (20,25] 1090    0.5440367 0.455963303    0.0000000                  0
+    ## 3         3    3       10-11  (20,25]  292    0.9349315 0.065068493    0.0000000                  0
+    ## 4         4    4       10-11  (20,25]  136    0.0000000 0.007352941    0.9926471                  0
+    ## 5         6    2         1-2  (20,25]  145    0.2827586 0.717241379    0.0000000                  0
+    ## 6         7    3         1-2  (20,25]  214    0.4439252 0.556074766    0.0000000                  0
+    ## 7         8    4         1-2  (20,25]  111    0.0000000 0.027027027    0.9729730                  0
+    ## 8         9    1         3-6  (20,25]   39    0.3333333 0.666666667    0.0000000                  0
+    ## 9        10    2         3-6  (20,25] 1031    0.4578080 0.542192047    0.0000000                  0
+    ## 10       11    3         3-6  (20,25]  726    0.9049587 0.095041322    0.0000000                  0
 
 There are around 300 total states. Next, like in the post I linked
 above, I simulate a drive by sampling from the data, sampling the play
 result based on the state I am currently in. The drive stops when
 there’s a touchdown, turnover,turnover-on-downs, field goal,field goal
 miss, or safety. Below is an example of a simulated drive starting from
-the 25:
+the
+    25:
 
-    ##    down.original yards.to.go yards.from.own.goal State.ID
-    ## 1:             1          10                  25        1
-    ## 2:             2           6                  29      350
-    ## 3:             3           6                  29      351
-    ## 4:             4           1                  34       28
-    ##                                                                                                                 desc
-    ## 1:                                              (5:58) (Shotgun) S.Wilson right end to TB 26 for 4 yards (M.Foster).
-    ## 2:                                                    (3:50) D.Brees pass incomplete deep left to B.Cooks (J.Haden).
-    ## 3:    (13:48) (No Huddle, Shotgun) P.Manning pass short left to W.Welker pushed ob at DEN 32 for 5 yards (J.Taylor).
-    ## 4: (6:09) R.Allen punts 53 yards to HOU 13, Center-J.Cardona. T.Ervin to HOU 18 for 5 yards (J.Bademosi, J.Cardona).
-    ##    yards_gained new.down new.distance
-    ## 1:            4        2            6
-    ## 2:            0        3            6
-    ## 3:            5        4            1
-    ## 4:            0        5            1
+    ##    down.original yards.to.go yards.from.own.goal State.ID                                                                                                              desc yards_gained new.down new.distance
+    ## 1:             1          10                  25        1                                              (5:58) (Shotgun) S.Wilson right end to TB 26 for 4 yards (M.Foster).            4        2            6
+    ## 2:             2           6                  29      350                                                    (3:50) D.Brees pass incomplete deep left to B.Cooks (J.Haden).            0        3            6
+    ## 3:             3           6                  29      351    (13:48) (No Huddle, Shotgun) P.Manning pass short left to W.Welker pushed ob at DEN 32 for 5 yards (J.Taylor).            5        4            1
+    ## 4:             4           1                  34       28 (6:09) R.Allen punts 53 yards to HOU 13, Center-J.Cardona. T.Ervin to HOU 18 for 5 yards (J.Bademosi, J.Cardona).            0        5            1
 
 I repeat this to get 10,000 simulated drives starting from the 25 yard
 line. I can now look at how these results line up to drives in the
@@ -81,34 +61,22 @@ define any custom strategy I want and see how it changes the results.
 For example, instead of the default state
     here:
 
-    ##   State.ID down ydstogo.bin yfog.bin freq percent.pass percent.run
-    ## 1        1    1       10-11  (20,25] 5471    0.4697496 0.530250411
-    ## 2        2    2       10-11  (20,25] 1090    0.5440367 0.455963303
-    ## 3        3    3       10-11  (20,25]  292    0.9349315 0.065068493
-    ## 4        4    4       10-11  (20,25]  136    0.0000000 0.007352941
-    ## 5        6    2         1-2  (20,25]  145    0.2827586 0.717241379
-    ##   percent.punt percent.field_goal
-    ## 1    0.0000000                  0
-    ## 2    0.0000000                  0
-    ## 3    0.0000000                  0
-    ## 4    0.9926471                  0
-    ## 5    0.0000000                  0
+    ##   State.ID down ydstogo.bin yfog.bin freq percent.pass percent.run percent.punt percent.field_goal
+    ## 1        1    1       10-11  (20,25] 5471    0.4697496 0.530250411    0.0000000                  0
+    ## 2        2    2       10-11  (20,25] 1090    0.5440367 0.455963303    0.0000000                  0
+    ## 3        3    3       10-11  (20,25]  292    0.9349315 0.065068493    0.0000000                  0
+    ## 4        4    4       10-11  (20,25]  136    0.0000000 0.007352941    0.9926471                  0
+    ## 5        6    2         1-2  (20,25]  145    0.2827586 0.717241379    0.0000000                  0
 
 I can increase passes +10% on 1st-3rd
     downs:
 
-    ##   State.ID down ydstogo.bin yfog.bin freq percent.pass percent.run
-    ## 1        1    1       10-11  (20,25] 5471    0.5697496 0.430250411
-    ## 2        2    2       10-11  (20,25] 1090    0.6440367 0.355963303
-    ## 3        3    3       10-11  (20,25]  292    1.0000000 0.000000000
-    ## 4        4    4       10-11  (20,25]  136    0.0000000 0.007352941
-    ## 5        6    2         1-2  (20,25]  145    0.3827586 0.617241379
-    ##   percent.punt percent.field_goal
-    ## 1    0.0000000                  0
-    ## 2    0.0000000                  0
-    ## 3    0.0000000                  0
-    ## 4    0.9926471                  0
-    ## 5    0.0000000                  0
+    ##   State.ID down ydstogo.bin yfog.bin freq percent.pass percent.run percent.punt percent.field_goal
+    ## 1        1    1       10-11  (20,25] 5471    0.5697496 0.430250411    0.0000000                  0
+    ## 2        2    2       10-11  (20,25] 1090    0.6440367 0.355963303    0.0000000                  0
+    ## 3        3    3       10-11  (20,25]  292    1.0000000 0.000000000    0.0000000                  0
+    ## 4        4    4       10-11  (20,25]  136    0.0000000 0.007352941    0.9926471                  0
+    ## 5        6    2         1-2  (20,25]  145    0.3827586 0.617241379    0.0000000                  0
 
 For example in state 1, I select a pass 57% of the time instead of 47%
 of the time.. pretty simple. In R, I just do a weighted sample now. I
@@ -144,20 +112,13 @@ number of long or short passes in a state will increase the sack rate:
     ## -0.098658 -0.004505 -0.000258  0.005234  0.093468 
     ## 
     ## Coefficients:
-    ##                           Estimate Std. Error t value             Pr(>|t|)
-    ## (Intercept)               0.019237   0.002232   8.619 0.000000000000000249
-    ## scale(percent.short.pass) 0.009582   0.001629   5.882 0.000000009603993615
-    ## scale(percent.long.pass)  0.014985   0.001374  10.903 < 0.0000000000000002
-    ## as.factor(down)2          0.002848   0.002905   0.980                0.328
-    ## as.factor(down)3          0.031731   0.003362   9.439 < 0.0000000000000002
-    ## as.factor(down)4          0.009413   0.003852   2.443                0.015
-    ##                              
-    ## (Intercept)               ***
-    ## scale(percent.short.pass) ***
-    ## scale(percent.long.pass)  ***
-    ## as.factor(down)2             
-    ## as.factor(down)3          ***
-    ## as.factor(down)4          *  
+    ##                           Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept)               0.019237   0.002232   8.619 0.000000000000000249 ***
+    ## scale(percent.short.pass) 0.009582   0.001629   5.882 0.000000009603993615 ***
+    ## scale(percent.long.pass)  0.014985   0.001374  10.903 < 0.0000000000000002 ***
+    ## as.factor(down)2          0.002848   0.002905   0.980                0.328    
+    ## as.factor(down)3          0.031731   0.003362   9.439 < 0.0000000000000002 ***
+    ## as.factor(down)4          0.009413   0.003852   2.443                0.015 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -171,20 +132,15 @@ short, 30 long and 12 sacks, I say 4 were short, 8 were long attempts.
 This is just a way for me to attribute sacks, I think it is somewhat
 reasonable. The 2x might be wrong but it is just a parameter that I can
 experiment with to see how it affects the results. After attributing the
-sacks I end up with this:
+sacks I end up with
+    this:
 
-    ##   State.ID down ydstogo.bin yfog.bin freq percent.short.pass
-    ## 1        1    1       10-11  (20,25] 5471          0.3065616
-    ## 2        2    2       10-11  (20,25] 1090          0.3735254
-    ## 3        3    3       10-11  (20,25]  292          0.4217736
-    ## 4        4    4       10-11  (20,25]  136          0.0000000
-    ## 5        6    2         1-2  (20,25]  145          0.2228907
-    ##   percent.long.pass percent.run percent.punt percent.field_goal
-    ## 1        0.16318795 0.530250411    0.0000000                  0
-    ## 2        0.17051132 0.455963303    0.0000000                  0
-    ## 3        0.51315789 0.065068493    0.0000000                  0
-    ## 4        0.00000000 0.007352941    0.9926471                  0
-    ## 5        0.05986794 0.717241379    0.0000000                  0
+    ##   State.ID down ydstogo.bin yfog.bin freq percent.short.pass percent.long.pass percent.run percent.punt percent.field_goal
+    ## 1        1    1       10-11  (20,25] 5471          0.3065616        0.16318795 0.530250411    0.0000000                  0
+    ## 2        2    2       10-11  (20,25] 1090          0.3735254        0.17051132 0.455963303    0.0000000                  0
+    ## 3        3    3       10-11  (20,25]  292          0.4217736        0.51315789 0.065068493    0.0000000                  0
+    ## 4        4    4       10-11  (20,25]  136          0.0000000        0.00000000 0.007352941    0.9926471                  0
+    ## 5        6    2         1-2  (20,25]  145          0.2228907        0.05986794 0.717241379    0.0000000                  0
 
 I’m finally ready to test out several different strategies of increasing
 long and/or short passes. Below I show the drive results of different
